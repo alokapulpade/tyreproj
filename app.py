@@ -7,6 +7,9 @@ from psycopg2.extras import RealDictCursor
 import re
 import os
 import urllib.parse
+import random
+from datetime import datetime, timedelta
+from flask_mail import Mail, Message
 
 load_dotenv()
 
@@ -15,7 +18,13 @@ app = Flask(__name__)
 # Secret key for login sessions
 app.secret_key = "tyre_store_secret_key"
 
+app.config["MAIL_SERVER"] = "smtp.gmail.com"
+app.config["MAIL_PORT"] = 587
+app.config["MAIL_USE_TLS"] = True
+app.config["MAIL_USERNAME"] = os.getenv("MAIL_EMAIL")
+app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
 
+mail = Mail(app)
 
 # WhatsApp number
 # Replace this later with the actual business WhatsApp number
@@ -325,6 +334,95 @@ If you did not request this, please ignore this email.
     return render_template("register.html")
 
 # =========================================================
+# VERIFY OTP
+# =========================================================
+
+@app.route("/verify-otp", methods=["GET", "POST"])
+def verify_otp():
+
+    email = session.get("verification_email")
+
+    if not email:
+        return redirect(url_for("register"))
+
+    if request.method == "POST":
+
+        entered_otp = request.form["otp"]
+
+        conn = get_db()
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+
+        cur.execute("""
+            SELECT *
+            FROM otp_verifications
+            WHERE email=%s
+            ORDER BY id DESC
+            LIMIT 1
+        """, (email,))
+
+        verification = cur.fetchone()
+
+        if not verification:
+            cur.close()
+            conn.close()
+
+            return render_template(
+                "verify_otp.html",
+                error="OTP not found. Please register again."
+            )
+
+        expires_at = datetime.fromisoformat(
+            verification["expires_at"]
+        )
+
+        if datetime.now() > expires_at:
+
+            cur.close()
+            conn.close()
+
+            return render_template(
+                "verify_otp.html",
+                error="OTP has expired. Please register again."
+            )
+
+        if entered_otp != verification["otp"]:
+
+            cur.close()
+            conn.close()
+
+            return render_template(
+                "verify_otp.html",
+                error="Invalid OTP."
+            )
+
+        cur.execute("""
+            INSERT INTO users
+            (name, email, password, is_verified)
+            VALUES (%s, %s, %s, %s)
+        """, (
+            verification["name"],
+            verification["email"],
+            verification["password"],
+            1
+        ))
+
+        cur.execute(
+            "DELETE FROM otp_verifications WHERE email=%s",
+            (email,)
+        )
+
+        conn.commit()
+
+        cur.close()
+        conn.close()
+
+        session.pop("verification_email", None)
+
+        return redirect(url_for("login"))
+
+    return render_template("verify_otp.html")
+
+# =========================================================
 # LOGIN
 # =========================================================
 
@@ -416,18 +514,21 @@ def admin_dashboard():
         return redirect(url_for("admin_login"))
 
     conn = get_db()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
 
-    tyres = conn.execute(
+    cur.execute(
         "SELECT * FROM tyres ORDER BY id DESC"
-    ).fetchall()
+    )
 
+    tyres = cur.fetchall()
+
+    cur.close()
     conn.close()
 
     return render_template(
         "admin_dashboard.html",
         tyres=tyres
     )
-
 
 # =========================================================
 # ADD TYRE
@@ -448,8 +549,9 @@ def add_tyre():
     image = request.form["image"]
 
     conn = get_db()
+    cur = conn.cursor()
 
-    conn.execute("""
+    cur.execute("""
         INSERT INTO tyres
         (brand, model, size, position, availability, price, image)
         VALUES (%s, %s, %s, %s, %s, %s, %s)
@@ -464,6 +566,8 @@ def add_tyre():
     ))
 
     conn.commit()
+
+    cur.close()
     conn.close()
 
     return redirect(url_for("admin_dashboard"))
@@ -480,13 +584,16 @@ def delete_tyre(tyre_id):
         return redirect(url_for("admin_login"))
 
     conn = get_db()
+    cur = conn.cursor()
 
-    conn.execute(
+    cur.execute(
         "DELETE FROM tyres WHERE id=%s",
         (tyre_id,)
     )
 
     conn.commit()
+
+    cur.close()
     conn.close()
 
     return redirect(url_for("admin_dashboard"))
@@ -512,12 +619,16 @@ def admin_logout():
 def whatsapp(tyre_id):
 
     conn = get_db()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
 
-    tyre = conn.execute(
+    cur.execute(
         "SELECT * FROM tyres WHERE id=%s",
         (tyre_id,)
-    ).fetchone()
+    )
 
+    tyre = cur.fetchone()
+
+    cur.close()
     conn.close()
 
     if not tyre:
@@ -537,7 +648,6 @@ def whatsapp(tyre_id):
 
     return redirect(whatsapp_url)
 
-
 # =========================================================
 # FAVOURITE / UNFAVOURITE
 # =========================================================
@@ -551,18 +661,21 @@ def favourite(tyre_id):
     user_id = session["user_id"]
 
     conn = get_db()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
 
-    existing = conn.execute("""
+    cur.execute("""
         SELECT * FROM favourites
         WHERE user_id=%s AND tyre_id=%s
     """, (
         user_id,
         tyre_id
-    )).fetchone()
+    ))
+
+    existing = cur.fetchone()
 
     if existing:
 
-        conn.execute("""
+        cur.execute("""
             DELETE FROM favourites
             WHERE user_id=%s AND tyre_id=%s
         """, (
@@ -572,7 +685,7 @@ def favourite(tyre_id):
 
     else:
 
-        conn.execute("""
+        cur.execute("""
             INSERT INTO favourites
             (user_id, tyre_id)
             VALUES (%s, %s)
@@ -582,6 +695,8 @@ def favourite(tyre_id):
         ))
 
     conn.commit()
+
+    cur.close()
     conn.close()
 
     return redirect(url_for("catalogue"))
@@ -599,21 +714,15 @@ def search_tyre():
         return jsonify([])
 
     # Keep only numbers.
-    # This makes all of these equivalent:
-    #
-    # 195/65 R15
-    # 195 65 R15
-    # 19565R15
-    # 195/65R15
-    #
     normalized_query = re.sub(r"[^0-9]", "", query)
 
     if not normalized_query:
         return jsonify([])
 
     conn = get_db()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
 
-    tyres = conn.execute("""
+    cur.execute("""
         SELECT
             id,
             brand,
@@ -625,8 +734,11 @@ def search_tyre():
             image
         FROM tyres
         ORDER BY id DESC
-    """).fetchall()
+    """)
 
+    tyres = cur.fetchall()
+
+    cur.close()
     conn.close()
 
     results = []
@@ -681,24 +793,22 @@ def chat():
 
     if user_message.lower() in greetings:
         return jsonify({
-            "reply": "Hello! 👋 How can I help you with your tyres today%s"
+            "reply": "Hello! 👋 How can I help you with your tyres today?"
         })
 
-
-    # =========================================
-    # GET CURRENT CATALOGUE INFORMATION
-    # =========================================
-
     conn = get_db()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
 
-    tyres = conn.execute("""
+    cur.execute("""
         SELECT brand, model, size, position, availability, price
         FROM tyres
         ORDER BY brand, model
-    """).fetchall()
+    """)
 
+    tyres = cur.fetchall()
+
+    cur.close()
     conn.close()
-
 
     # Create catalogue information for Gemini
 
