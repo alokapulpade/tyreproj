@@ -1,0 +1,362 @@
+{% extends "base.html" %}
+
+{% block title %}Kedar Tyres - Home{% endblock %}
+
+{% block content %}
+
+<!-- =========================
+     HERO SECTION
+========================= -->
+
+<section id="home" class="hero-section">
+
+    <div class="hero-background">
+        <div class="hero-overlay"></div>
+    </div>
+
+    <div class="hero-content">
+
+        <div class="hero-text">
+
+            <p class="hero-tagline">YOUR TRUSTED TYRE PARTNER</p>
+
+            <h1>
+                Drive with<br>
+                <span>Confidence.</span>
+            </h1>
+
+            <p class="hero-description">
+                Find the right tyres for your vehicle with Kedar Tyres.
+                Quality products and reliable tyre services, all in one place.
+            </p>
+
+            <div class="hero-buttons">
+    <button class="primary-btn" id="openTyreSearch" type="button">
+        Search by Tyre
+    </button>
+
+    <button class="secondary-btn" id="openVehicleSearch" type="button">
+        Search by Vehicle
+    </button>
+</div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =========================
+     FEATURED TYRES
+========================= -->
+
+<section id="tyres" class="featured-section">
+
+    <div class="section-content">
+
+        <p class="section-label">OUR PRODUCTS</p>
+
+        <h2>Featured Tyres</h2>
+
+        <p class="section-description">
+            Explore some of the tyres currently available in our inventory.
+            Find the right fit for your vehicle.
+        </p>
+
+
+        {% if featured_tyres %}
+
+        <div class="featured-grid">
+
+            {% for tyre in featured_tyres %}
+
+            <div class="tyre-card"
+                 onclick="showTyre(
+                    '{{ tyre.id }}',
+                    '{{ tyre.brand }}',
+                    '{{ tyre.model }}',
+                    '{{ tyre.size }}',
+                    '{{ tyre.position }}',
+                    '{{ tyre.availability }}',
+                    '{{ tyre.price }}',
+                    '{{ tyre.image }}'
+                 )">
+
+                <!-- TYRE IMAGE -->
+
+                <div class="tyre-image-placeholder">
+
+                    {% if tyre.image %}
+
+                    <img
+                        src="{{ url_for(
+                            'static',
+                            filename='images/' + tyre.image
+                        ) }}"
+                        alt="{{ tyre.brand }} {{ tyre.model }}"
+                        onerror="this.style.display='none'"
+                    >
+
+                    {% else %}
+
+                    <div class="fake-tyre">
+                        🛞
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- TYRE INFORMATION -->
+
+                <div class="brand">
+                    {{ tyre.brand }}
+                </div>
+
+                <h3>
+                    {{ tyre.model }}
+                </h3>
+
+                <p>
+                    <strong>Size:</strong>
+                    {{ tyre.size }}
+                </p>
+
+                <span class="
+                    {% if tyre.availability == 'Available' %}
+                        available
+                    {% else %}
+                        unavailable
+                    {% endif %}
+                ">
+                    {{ tyre.availability }}
+                </span>
+
+                <h3>
+                    ₹{{ tyre.price }}
+                </h3>
+
+                <button
+                    class="card-btn"
+                    onclick="event.stopPropagation(); showTyre(
+                        '{{ tyre.id }}',
+                        '{{ tyre.brand }}',
+                        '{{ tyre.model }}',
+                        '{{ tyre.size }}',
+                        '{{ tyre.position }}',
+                        '{{ tyre.availability }}',
+                        '{{ tyre.price }}',
+                        '{{ tyre.image }}'
+                    )">
+
+                    View Details
+
+                </button>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <div class="empty-favourites">
+
+            <h3>
+                No tyres available
+            </h3>
+
+            <p>
+                Our tyre inventory is currently empty.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+
+        <a href="{{ url_for('catalogue') }}"
+           class="catalogue-btn">
+
+            View Full Catalogue
+
+        </a>
+
+    </div>
+
+</section>
+
+<!-- =========================
+     SERVICES PREVIEW
+========================= -->
+
+<section id="services" class="services-section">
+
+
+<div class="section-content">
+
+    <p class="section-label">WHAT WE OFFER</p>
+
+    <h2>Our Services</h2>
+
+    <p class="section-description">
+        Professional tyre and wheel services to keep your vehicle
+        performing at its best.
+    </p>
+
+    <div class="services-grid">
+
+        <div class="service-card">
+            <div class="service-icon">01</div>
+            <h3>Tyre Fitting</h3>
+            <p>
+                Professional tyre installation for a proper and secure fit.
+            </p>
+        </div>
+
+
+        <div class="service-card">
+            <div class="service-icon">02</div>
+            <h3>Wheel Alignment</h3>
+            <p>
+                Accurate wheel alignment for better handling and tyre life.
+            </p>
+        </div>
+
+
+        <div class="service-card">
+            <div class="service-icon">03</div>
+            <h3>Wheel Balancing</h3>
+            <p>
+                Balanced wheels for a smoother and more comfortable drive.
+            </p>
+        </div>
+
+
+        <div class="service-card">
+            <div class="service-icon">04</div>
+            <h3>Puncture Repair</h3>
+            <p>
+                Reliable puncture repair to get you safely back on the road.
+            </p>
+        </div>
+
+    </div>
+
+    <a href="/services" class="services-btn">Explore All Services</a>
+
+</div>
+
+</section>
+
+<!-- CUSTOMER REVIEWS -->
+
+<!-- =========================
+     CUSTOMER REVIEWS
+========================= -->
+
+<section class="reviews-section">
+
+
+<div class="section-content">
+
+    <p class="section-label">CUSTOMER REVIEWS</p>
+
+    <h2>What Our Customers Say</h2>
+
+    <p class="section-description">
+        See what customers have to say about their experience with Kedar Tyres.
+    </p>
+
+    <div class="reviews-slider">
+
+        <div class="reviews-track">
+
+            <div class="review-card">
+                <div class="stars">★★★★★</div>
+                <p>
+                    "Great service and a smooth tyre-buying experience.
+                    The staff was very helpful."
+                </p>
+                <h3>Sample Customer</h3>
+            </div>
+
+            <div class="review-card">
+                <div class="stars">★★★★★</div>
+                <p>
+                    "Very professional service and quick tyre fitting.
+                    Would definitely recommend them."
+                </p>
+                <h3>Sample Customer</h3>
+            </div>
+
+            <div class="review-card">
+                <div class="stars">★★★★★</div>
+                <p>
+                    "They helped me choose the right tyres for my vehicle.
+                    Good service and support."
+                </p>
+                <h3>Sample Customer</h3>
+            </div>
+
+            <div class="review-card">
+                <div class="stars">★★★★★</div>
+                <p>
+                    "Good experience overall. The service was quick
+                    and the staff was helpful."
+                </p>
+                <h3>Sample Customer</h3>
+            </div>
+
+            <div class="review-card">
+                <div class="stars">★★★★★</div>
+                <p>
+                    "Reliable tyre service and a friendly team.
+                    Very satisfied with the experience."
+                </p>
+                <h3>Sample Customer</h3>
+            </div>
+
+            <!-- Duplicate cards for smooth continuous scrolling -->
+
+            <div class="review-card">
+                <div class="stars">★★★★★</div>
+                <p>
+                    "Great service and a smooth tyre-buying experience.
+                    The staff was very helpful."
+                </p>
+                <h3>Sample Customer</h3>
+            </div>
+
+            <div class="review-card">
+                <div class="stars">★★★★★</div>
+                <p>
+                    "Very professional service and quick tyre fitting.
+                    Would definitely recommend them."
+                </p>
+                <h3>Sample Customer</h3>
+            </div>
+
+            <div class="review-card">
+                <div class="stars">★★★★★</div>
+                <p>
+                    "They helped me choose the right tyres for my vehicle.
+                    Good service and support."
+                </p>
+                <h3>Sample Customer</h3>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+</section>
+
+
+
+{% endblock %}

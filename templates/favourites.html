@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+
+{% block title %}Kedar Tyres - Favourites{% endblock %}
+
+{% block content %}
+
+<section class="catalogue favourites-section">
+
+```
+<div class="catalogue-heading">
+
+    <p class="small-title">
+        SAVED PRODUCTS
+    </p>
+
+    <h1>
+        Your Favourite Tyres
+    </h1>
+
+    <p>
+        Tyres you have saved for later.
+    </p>
+
+</div>
+
+
+{% if tyres %}
+
+<div class="tyre-grid">
+
+    {% for tyre in tyres %}
+
+    <div class="tyre-card"
+         onclick="showTyre(
+            '{{ tyre.id }}',
+            '{{ tyre.brand }}',
+            '{{ tyre.model }}',
+            '{{ tyre.size }}',
+            '{{ tyre.position }}',
+            '{{ tyre.availability }}',
+            '{{ tyre.price }}',
+            '{{ tyre.image }}'
+         )">
+
+        <!-- REMOVE FROM FAVOURITES -->
+
+        <a href="{{ url_for('favourite', tyre_id=tyre.id) }}"
+           class="card-favourite"
+           onclick="event.stopPropagation();"
+           title="Remove from favourites">
+
+            ♥
+
+        </a>
+
+
+        <!-- TYRE IMAGE -->
+
+        <div class="tyre-image">
+
+            {% if tyre.image %}
+
+            <img
+                src="{{ url_for(
+                    'static',
+                    filename='images/' + tyre.image
+                ) }}"
+                alt="{{ tyre.brand }} {{ tyre.model }}"
+                onerror="this.style.display='none'"
+            >
+
+            {% else %}
+
+            <div class="fake-tyre">
+                🛞
+            </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- TYRE INFORMATION -->
+
+        <div class="tyre-info">
+
+            <div class="brand">
+                {{ tyre.brand }}
+            </div>
+
+            <h2>
+                {{ tyre.model }}
+            </h2>
+
+            <p>
+                <strong>Size:</strong>
+                {{ tyre.size }}
+            </p>
+
+            <p>
+                <strong>Position:</strong>
+                {{ tyre.position }}
+            </p>
+
+
+            <span class="
+                {% if tyre.availability == 'Available' %}
+                    available
+                {% else %}
+                    unavailable
+                {% endif %}
+            ">
+
+                {{ tyre.availability }}
+
+            </span>
+
+
+            <h3>
+                ₹{{ tyre.price }}
+            </h3>
+
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+
+{% else %}
+
+<!-- EMPTY FAVOURITES -->
+
+<div class="empty-favourites">
+
+    <div class="empty-icon">
+        ♡
+    </div>
+
+    <h3>
+        No favourites yet
+    </h3>
+
+    <p>
+        When you like a tyre from the catalogue,
+        it will appear here.
+    </p>
+
+    <a href="{{ url_for('catalogue') }}"
+       class="favourites-btn">
+
+        Browse Tyres
+
+    </a>
+
+</div>
+
+{% endif %}
+```
+
+</section>
+
+<!-- ================================
+     TYRE DETAILS MODAL
+================================= -->
+
+<div id="tyreModal"
+     class="modal">
+
+```
+<div class="modal-content">
+
+    <span class="modal-close"
+          onclick="closeTyre()">
+
+        ✕
+
+    </span>
+
+
+    <div id="modalImage"></div>
+
+
+    <h2 id="modalBrand"></h2>
+
+    <h3 id="modalModel"></h3>
+
+
+    <p>
+
+        <strong>Tyre Size:</strong>
+
+        <span id="modalSize"></span>
+
+    </p>
+
+
+    <p>
+
+        <strong>Position:</strong>
+
+        <span id="modalPosition"></span>
+
+    </p>
+
+
+    <p>
+
+        <strong>Availability:</strong>
+
+        <span id="modalAvailability"></span>
+
+    </p>
+
+
+    <p>
+
+        <strong>Price:</strong>
+
+        ₹<span id="modalPrice"></span>
+
+    </p>
+
+
+    <div class="modal-buttons">
+
+
+        <!-- WHATSAPP -->
+
+        <a id="whatsappButton"
+           href="#"
+           target="_blank"
+           class="whatsapp-btn">
+
+            📱 Contact Owner on WhatsApp
+
+        </a>
+
+
+        <!-- REMOVE FROM FAVOURITES -->
+
+        <a id="favouriteButton"
+           href="#"
+           class="favourite-btn">
+
+            ♥ Remove from Favourite
+
+        </a>
+
+
+    </div>
+
+</div>
+
+
+</div>
+
+{% endblock %}

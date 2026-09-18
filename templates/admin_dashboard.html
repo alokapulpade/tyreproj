@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+{% block title %}
+Admin Dashboard
+{% endblock %}
+
+
+{% block content %}
+
+<section class="admin-dashboard">
+
+    <div class="admin-header">
+
+        <div>
+
+            <p class="small-title">
+                ADMIN PANEL
+            </p>
+
+            <h1>
+                Tyre Management
+            </h1>
+
+        </div>
+
+        <a href="{{ url_for('admin_logout') }}"
+           class="logout-btn">
+
+            Logout
+
+        </a>
+
+    </div>
+
+
+    <!-- ADD TYRE -->
+
+    <div class="admin-form">
+
+        <h2>
+            ➕ Add New Tyre
+        </h2>
+
+        <form
+            method="POST"
+            action="{{ url_for('add_tyre') }}"
+        >
+
+            <input
+                type="text"
+                name="brand"
+                placeholder="Brand"
+                required
+            >
+
+            <input
+                type="text"
+                name="model"
+                placeholder="Model"
+                required
+            >
+
+            <input
+                type="text"
+                name="size"
+                placeholder="Tyre Size e.g. 175/65 R15"
+                required
+            >
+
+            <select name="position">
+
+                <option>
+                    Front / Rear
+                </option>
+
+                <option>
+                    Front
+                </option>
+
+                <option>
+                    Rear
+                </option>
+
+            </select>
+
+            <select name="availability">
+
+                <option>
+                    Available
+                </option>
+
+                <option>
+                    Out of Stock
+                </option>
+
+            </select>
+
+            <input
+                type="number"
+                name="price"
+                placeholder="Price"
+                required
+            >
+
+            <input
+                type="text"
+                name="image"
+                placeholder="Image filename e.g. tyre1.jpg"
+            >
+
+            <button type="submit">
+                Add Tyre
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- TYRE LIST -->
+
+    <div class="admin-table">
+
+        <h2>
+            Current Tyres
+        </h2>
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>ID</th>
+                    <th>Brand</th>
+                    <th>Model</th>
+                    <th>Size</th>
+                    <th>Position</th>
+                    <th>Status</th>
+                    <th>Price</th>
+                    <th>Action</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for tyre in tyres %}
+
+                <tr>
+
+                    <td>
+                        {{ tyre.id }}
+                    </td>
+
+                    <td>
+                        {{ tyre.brand }}
+                    </td>
+
+                    <td>
+                        {{ tyre.model }}
+                    </td>
+
+                    <td>
+                        {{ tyre.size }}
+                    </td>
+
+                    <td>
+                        {{ tyre.position }}
+                    </td>
+
+                    <td>
+                        {{ tyre.availability }}
+                    </td>
+
+                    <td>
+                        ₹{{ tyre.price }}
+                    </td>
+
+                    <td>
+
+                        <a
+                            href="{{ url_for(
+                                'delete_tyre',
+                                tyre_id=tyre.id
+                            ) }}"
+                            class="delete-btn"
+                            onclick="return confirm(
+                                'Delete this tyre?'
+                            )"
+                        >
+
+                            Delete
+
+                        </a>
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}
+XYZ Tyres - Create Account
+{% endblock %}
+
+{% block content %}
+
+<section class="auth-section">
+
+    <div class="auth-container">
+
+        <!-- BRAND -->
+
+        <div class="auth-brand">
+
+            <div class="auth-logo">
+                KT
+            </div>
+
+            <div class="auth-brand-text">
+                <span>XYZ TYRES</span>
+                <small>YOUR TRUSTED TYRE PARTNER</small>
+            </div>
+
+        </div>
+
+
+        <!-- HEADING -->
+
+        <div class="auth-heading">
+
+            <h1>
+                Create Account
+            </h1>
+
+            <p>
+                Join XYZ Tyres to save and manage your favourite tyres.
+            </p>
+
+        </div>
+
+
+        <!-- ERROR -->
+
+        {% if error %}
+
+        <div class="error-message">
+            {{ error }}
+        </div>
+
+        {% endif %}
+
+
+        <!-- REGISTER FORM -->
+
+        <form
+            method="POST"
+            class="auth-form"
+        >
+
+            <div class="form-group">
+
+                <label for="name">
+                    Full Name
+                </label>
+
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder="Enter your full name"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="email">
+                    Email Address
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="Enter your email"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="password">
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Create a password"
+                    required
+                >
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="auth-submit"
+            >
+                Create Account
+                <span>→</span>
+            </button>
+
+        </form>
+
+
+        <!-- LOGIN LINK -->
+
+        <div class="auth-divider">
+            <span>ALREADY A CUSTOMER?</span>
+        </div>
+
+
+        <div class="auth-register">
+
+            <p>
+                Already have an account?
+            </p>
+
+            <a href="{{ url_for('login') }}">
+                Login to Your Account
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}
+XYZ Tyres - User Login
+{% endblock %}
+
+{% block content %}
+
+<section class="auth-section">
+
+<div class="auth-container">
+
+    <div class="auth-brand">
+        <div class="auth-logo">KT</div>
+
+        <div class="auth-brand-text">
+            <span>XYZ TYRES</span>
+            <small>YOUR TRUSTED TYRE PARTNER</small>
+        </div>
+    </div>
+
+    <div class="auth-heading">
+        <h1>Welcome Back</h1>
+
+        <p>
+            Login to explore tyres and manage your favourites.
+        </p>
+    </div>
+
+    {% if error %}
+
+    <div class="error-message">
+        {{ error }}
+    </div>
+
+    {% endif %}
+
+    <form method="POST" class="auth-form">
+
+        <div class="form-group">
+
+            <label for="email">
+                Email Address
+            </label>
+
+            <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="Enter your email"
+                required
+            >
+
+        </div>
+
+        <div class="form-group">
+
+            <label for="password">
+                Password
+            </label>
+
+            <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Enter your password"
+                required
+            >
+
+        </div>
+
+        <button type="submit" class="auth-submit">
+            Login
+            <span>→</span>
+        </button>
+
+    </form>
+
+    <div class="auth-divider">
+        <span>NEW TO XYZ TYRES?</span>
+    </div>
+
+    <div class="auth-register">
+
+        <p>
+            Don't have an account?
+        </p>
+
+        <a href="{{ url_for('register') }}">
+            Create an Account
+        </a>
+
+    </div>
+
+</div>
+
+</section>
+
+{% endblock %}

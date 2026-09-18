@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+
+{% block title %}Tyre Catalogue - XYZ Tyres{% endblock %}
+
+{% block content %}
+
+<section class="catalogue-section">
+
+    <div class="catalogue-header">
+        <h1>Tyre Catalogue</h1>
+        <p>Find the right tyre for your vehicle</p>
+    </div>
+
+    <div class="tyre-grid">
+
+        {% for tyre in tyres %}
+
+        <div class="tyre-card">
+
+            <!-- Tyre Image -->
+            <div class="tyre-image">
+                <img
+                    src="{{ url_for('static', filename='images/' + tyre.image) }}"
+                    alt="{{ tyre.brand }} {{ tyre.model }}"
+                >
+            </div>
+
+            <!-- Tyre Information -->
+            <div class="tyre-info">
+
+                <span class="tyre-brand">
+                    {{ tyre.brand }}
+                </span>
+
+                <h2>{{ tyre.model }}</h2>
+
+                <!-- Size -->
+                <p class="tyre-detail">
+                    <strong>Size:</strong>
+                    {{ tyre.size }}
+                </p>
+
+                <!-- FRONT / REAR -->
+                <p class="tyre-position">
+                    <strong>Position:</strong>
+
+                    {% if tyre.position %}
+                        <span class="position-badge">
+                            {{ tyre.position }}
+                        </span>
+                    {% else %}
+                        <span class="position-badge">
+                            Front / Rear
+                        </span>
+                    {% endif %}
+                </p>
+
+                <!-- Availability -->
+                <div class="availability">
+
+                    {% if tyre.availability == "Available" %}
+
+                        <span class="available">
+                            ● Available
+                        </span>
+
+                    {% else %}
+
+                        <span class="not-available">
+                            ● Not Available
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+                <!-- Price -->
+                <p class="tyre-price">
+                    ₹{{ tyre.price }}
+                </p>
+
+                <!-- View Details -->
+                <button
+                    class="details-btn"
+                    onclick="showTyreDetails(
+                        '{{ tyre.brand }}',
+                        '{{ tyre.model }}',
+                        '{{ tyre.size }}',
+                        '{{ tyre.position }}',
+                        '{{ tyre.availability }}',
+                        '{{ tyre.price }}',
+                        '{{ tyre.image }}'
+                    )"
+                >
+                    View Details
+                </button>
+
+            </div>
+
+        </div>
+
+        {% else %}
+
+        <div class="no-tyres">
+            <h2>No tyres available</h2>
+            <p>Please check again later.</p>
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     TYRE DETAILS POPUP
+========================= -->
+
+<div id="tyreModal" class="tyre-modal">
+
+    <div class="modal-box">
+
+        <button class="close-modal" onclick="closeTyreDetails()">
+            ×
+        </button>
+
+        <img id="modalImage" src="" alt="Tyre">
+
+        <h2 id="modalBrand"></h2>
+
+        <h3 id="modalModel"></h3>
+
+        <p>
+            <strong>Size:</strong>
+            <span id="modalSize"></span>
+        </p>
+
+        <p>
+            <strong>Position:</strong>
+            <span id="modalPosition"></span>
+        </p>
+
+        <p>
+            <strong>Availability:</strong>
+            <span id="modalAvailability"></span>
+        </p>
+
+        <p class="modal-price">
+            ₹<span id="modalPrice"></span>
+        </p>
+
+        <!-- Contact Owner -->
+        <a
+            id="whatsappButton"
+            class="whatsapp-btn"
+            href="#"
+            target="_blank"
+        >
+            💬 Contact Owner
+        </a>
+
+    </div>
+
+</div>
+
+<script>
+
+function showTyreDetails(
+    brand,
+    model,
+    size,
+    position,
+    availability,
+    price,
+    image
+) {
+
+    document.getElementById("modalBrand").innerText = brand;
+
+    document.getElementById("modalModel").innerText = model;
+
+    document.getElementById("modalSize").innerText = size;
+
+    document.getElementById("modalPosition").innerText =
+        position || "Front / Rear";
+
+    document.getElementById("modalAvailability").innerText =
+        availability;
+
+    document.getElementById("modalPrice").innerText = price;
+
+    document.getElementById("modalImage").src =
+        "/static/images/" + image;
+
+    /*
+       Replace 91XXXXXXXXXX with
+       your actual WhatsApp number.
+
+       Example:
+       919876543210
+    */
+
+    const whatsappNumber = "91XXXXXXXXXX";
+
+    const message =
+        "Hello, I am interested in this tyre.%0A%0A" +
+        "Brand: " + brand + "%0A" +
+        "Model: " + model + "%0A" +
+        "Size: " + size + "%0A" +
+        "Position: " + (position || "Front / Rear") + "%0A" +
+        "Price: ₹" + price;
+
+    document.getElementById("whatsappButton").href =
+        "https://wa.me/" + whatsappNumber +
+        "?text=" + message;
+
+    document.getElementById("tyreModal").style.display = "flex";
+}
+
+
+function closeTyreDetails() {
+
+    document.getElementById("tyreModal").style.display = "none";
+
+}
+
+
+/* Close popup by clicking outside */
+
+window.onclick = function(event) {
+
+    const modal = document.getElementById("tyreModal");
+
+    if (event.target === modal) {
+        modal.style.display = "none";
+    }
+
+}
+
+</script>
+
+{% endblock %}
