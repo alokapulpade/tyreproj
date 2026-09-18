@@ -439,7 +439,7 @@ def login():
         cur = conn.cursor(cursor_factory=RealDictCursor)
 
         cur.execute(
-            "SELECT * FROM users WHERE email=%s",
+            "SELECT * FROM users WHERE email=%s AND is_verified=1",
             (email,)
         )
 
