@@ -1,32 +1,130 @@
 <!DOCTYPE html>
+
 <html>
 <head>
-    <title>Verify OTP</title>
+    <title>Verify OTP - Kedar Tyres</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+<style>
+    .otp-page {
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+
+    .otp-card {
+        width: 100%;
+        max-width: 430px;
+        background: white;
+        padding: 40px;
+        border-radius: 16px;
+        text-align: center;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+    }
+
+    .otp-icon {
+        font-size: 48px;
+        margin-bottom: 10px;
+    }
+
+    .otp-card h2 {
+        margin-bottom: 10px;
+        color: #0b2545;
+    }
+
+    .otp-card p {
+        color: #666;
+        margin-bottom: 25px;
+    }
+
+    .otp-input {
+        width: 100%;
+        padding: 14px;
+        font-size: 24px;
+        text-align: center;
+        letter-spacing: 12px;
+        border: 2px solid #ddd;
+        border-radius: 10px;
+        box-sizing: border-box;
+        outline: none;
+    }
+
+    .otp-input:focus {
+        border-color: #0b2545;
+    }
+
+    .verify-btn {
+        width: 100%;
+        margin-top: 20px;
+        padding: 14px;
+        border: none;
+        border-radius: 10px;
+        background: #0b2545;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .verify-btn:hover {
+        background: #163d69;
+    }
+
+    .error-message {
+        color: #d62828 !important;
+        font-size: 14px;
+        margin-bottom: 15px;
+    }
+</style>
+
+
 </head>
 
 <body>
 
-<div class="container">
+<div class="otp-page">
+
+
+<div class="otp-card">
+
+    <div class="otp-icon">🔐</div>
+
     <h2>Verify Your Email</h2>
 
-    <p>Enter the 6-digit OTP sent to your email.</p>
+    <p>
+        We've sent a 6-digit verification code to your email address.
+        Enter it below to continue.
+    </p>
 
     {% if error %}
-        <p style="color: red;">{{ error }}</p>
+        <p class="error-message">{{ error }}</p>
     {% endif %}
 
     <form method="POST">
+
         <input
             type="text"
             name="otp"
-            placeholder="Enter OTP"
+            class="otp-input"
+            placeholder="••••••"
             maxlength="6"
+            pattern="[0-9]{6}"
+            inputmode="numeric"
+            autocomplete="one-time-code"
             required
         >
 
-        <button type="submit">Verify OTP</button>
+        <button type="submit" class="verify-btn">
+            Verify OTP
+        </button>
+
     </form>
+
+</div>
+
+
 </div>
 
 </body>
