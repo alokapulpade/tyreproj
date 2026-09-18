@@ -23,6 +23,7 @@ app.config["MAIL_PORT"] = 587
 app.config["MAIL_USE_TLS"] = True
 app.config["MAIL_USERNAME"] = os.getenv("MAIL_EMAIL")
 app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
+app.config["MAIL_DEFAULT_SENDER"] = os.getenv("MAIL_EMAIL")
 
 mail = Mail(app)
 
@@ -308,10 +309,10 @@ def register():
         conn.close()
 
         msg = Message(
-            "Kedar Tyres - Email Verification OTP",
-            sender=os.getenv("MAIL_EMAIL"),
-            recipients=[email]
-        )
+    "Kedar Tyres - OTP Verification",
+    sender=os.getenv("MAIL_EMAIL"),
+    recipients=[email]
+)
 
         msg.body = f"""
 Hello {name},
